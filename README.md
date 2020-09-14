@@ -1,5 +1,5 @@
 # Automatic-Attendance
-Automatic attendance system to be used mostly in schools in order to save time used to take attendance by hand.
+Automatic attendance system to be used mostly in schools in order to save time used to take attendance by hand.\n
 Pretty self explanatory:
 
 todo:
