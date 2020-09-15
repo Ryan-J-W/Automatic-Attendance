@@ -2,8 +2,9 @@ import face_recognition
 import cv2
 import numpy as np
 from gtts import gTTS
-from pygame import mixer
-import os
+from playsound import playsound
+import pgi
+import gi
 from playsound import playsound
 welcomed_list = []
 
@@ -17,7 +18,7 @@ obama_face_encoding = face_recognition.face_encodings(obama_image)[0]
 
 
 known_face_encodings = [ryan_face_encoding] #, biden_face_encoding]
-known_face_names = ['1776', "Barrack Obama"]
+known_face_names = ['Ryan Whyner', "Barrack Obama"]
 
 face_locations = []
 face_encodings = []
@@ -29,16 +30,23 @@ process_this_frame = True
 def welcome_student(name, welcomed_list):
     if name in welcomed_list:
         return welcomed_list
-    # The text that you want to convert to audio
     welcomed_list.append(name)
-    text = "Welcome to class, %s" % name
+    text = "Welcome,,,, %s" % name
     language = 'en'
 
     myobj = gTTS(text=text, lang=language, slow=False)
+    try:
+        file = name.split()[0]+name.split()[1]
+        file += '.wav'
+        myobj.save(file)
+        playsound(file)
+    except IndexError:
+        pass
 
-    myobj.save("%s.mp3"%name)
 
-    # Playing the converted file
+
+
+
 
     return welcomed_list
 
@@ -69,8 +77,9 @@ while True:
                 name = known_face_names[best_match_index]
 
             face_names.append(name)
+            if name not in welcomed_list:
+                welcomed_list = welcome_student(name, welcomed_list)
 
-            welcomed_list = welcome_student(name, welcomed_list)
 
 
     process_this_frame =   not process_this_frame
