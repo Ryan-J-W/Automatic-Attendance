@@ -31,8 +31,10 @@ def welcome_student(name, welcomed_list):
     if name in welcomed_list:
         return welcomed_list
     welcomed_list.append(name)
-    text = "Welcome,,,, %s" % name
+    text = "Welcome,,,, %s, you are all checked in!" % name
     language = 'en'
+    if name == 'Unknown':
+        text = 'Your face is not recognized, please register and come back soon.'
 
     myobj = gTTS(text=text, lang=language, slow=False)
     try:
@@ -60,7 +62,6 @@ while True:
     small_frame = cv2.resize(frame, (0,0), fx=0.25, fy=0.25)
 
     rgb_small_frame = small_frame[:,:,::-1]
-
     if process_this_frame:
         face_locations = face_recognition.face_locations(rgb_small_frame)
         face_encodings = face_recognition.face_encodings(rgb_small_frame, face_locations)
@@ -99,10 +100,12 @@ while True:
 
 
 
-    cv2.imshow('Video', frame)
+
 
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
+    cv2.imshow('Video', frame)
+
 
 video_capture.release()
 cv2.destroyAllWindows()
