@@ -2,8 +2,9 @@ import face_recognition
 import cv2
 import numpy as np
 from gtts import gTTS
-from pygame import mixer
-import os
+from playsound import playsound
+import pgi
+import gi
 from playsound import playsound
 welcomed_list = []
 
@@ -15,9 +16,12 @@ ryan_face_encoding = face_recognition.face_encodings(ryan_image)[0]
 obama_image = face_recognition.load_image_file('obama.jpg')
 obama_face_encoding = face_recognition.face_encodings(obama_image)[0]
 
+adam_image = face_recognition.load_image_file('adam.jpg')
+adam_face_encoding = face_recognition.face_encodings(adam_image)[0]
 
-known_face_encodings = [ryan_face_encoding] #, biden_face_encoding]
-known_face_names = ['1776', "Barrack Obama"]
+
+known_face_encodings = [ryan_face_encoding, adam_face_encoding]
+known_face_names = ['Ryan Whyner', 'Adam Whyner', "Barrack Obama"]
 
 face_locations = []
 face_encodings = []
@@ -29,16 +33,25 @@ process_this_frame = True
 def welcome_student(name, welcomed_list):
     if name in welcomed_list:
         return welcomed_list
-    # The text that you want to convert to audio
     welcomed_list.append(name)
-    text = "Welcome to class, %s" % name
+    text = "Welcome,,,, %s, you are all checked in!" % name
     language = 'en'
+    if name == 'Unknown':
+        text = 'Your face is not recognized, please register and come back soon.'
 
     myobj = gTTS(text=text, lang=language, slow=False)
+    try:
+        file = name.split()[0]+name.split()[1]
+        file += '.wav'
+        myobj.save(file)
+        playsound(file)
+    except IndexError:
+        pass
 
-    myobj.save("%s.mp3"%name)
 
-    # Playing the converted file
+
+
+
 
     return welcomed_list
 
@@ -51,14 +64,14 @@ while True:
 
     small_frame = cv2.resize(frame, (0,0), fx=0.25, fy=0.25)
 
+    name = 'Unknown'
     rgb_small_frame = small_frame[:,:,::-1]
-
     if process_this_frame:
         face_locations = face_recognition.face_locations(rgb_small_frame)
         face_encodings = face_recognition.face_encodings(rgb_small_frame, face_locations)
 
         face_name = []
-
+        best_match_index = 0
         for face_encoding in face_encodings:
             matches = face_recognition.compare_faces(known_face_encodings, face_encoding)
             name = "Unknown"
@@ -69,8 +82,12 @@ while True:
                 name = known_face_names[best_match_index]
 
             face_names.append(name)
+            if name not in welcomed_list:
+                welcomed_list = welcome_student(name, welcomed_list)
 
-            welcomed_list = welcome_student(name, welcomed_list)
+    name = known_face_names[best_match_index]
+    face_names = [name]
+
 
 
     process_this_frame =   not process_this_frame
@@ -90,13 +107,13 @@ while True:
 
 
 
-    cv2.imshow('Video', frame)
+
 
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
+    cv2.imshow('Video', frame)
+
 
 video_capture.release()
 cv2.destroyAllWindows()
-
-
 
